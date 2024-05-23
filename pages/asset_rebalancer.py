@@ -1,3 +1,4 @@
+from datetime import datetime
 import pandas as pd
 import streamlit as st
 import requests
@@ -45,11 +46,23 @@ def submit_rebalance_form():
 
 def get_ticker_value(target_date):
     collection = 'usd'
-    document, returned_date = get_mongo_document_by_date(collection, target_date)
-    df = pd.DataFrame(document['portfolio_details'])
-    # Create dictionary with Ticker as key and Value as value
-    ticker_value_dict = df.set_index('Ticker')['Value'].to_dict()
-    return ticker_value_dict
+    try:
+        document, returned_date = get_mongo_document_by_date(collection, target_date)
+        if not document:
+            raise ValueError(f"No document found for the date: {target_date}")
+
+        df = pd.DataFrame(document['portfolio_details'])
+        # Create dictionary with Ticker as key and Value as value
+        ticker_value_dict = df.set_index('Ticker')['Value'].to_dict()
+        return ticker_value_dict
+
+    except ValueError as ve:
+        st.error(str(ve))
+        return {}
+    except Exception as e:
+        st.error("An unexpected error occurred.")
+        st.error(str(e))
+        return {}
 
 st.write("# ⚖️ Asset Rebalancer")
 st.write("__:one: Enter your assets and weights__")
