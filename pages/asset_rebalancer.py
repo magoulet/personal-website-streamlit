@@ -1,9 +1,8 @@
 import pandas as pd
 import streamlit as st
 import requests
-import json
-import os
 
+from utilities.mongo import get_mongo_document_by_date
 
 # Define function to submit rebalance form
 def submit_rebalance_form():
@@ -35,21 +34,35 @@ def submit_rebalance_form():
     if response.status_code == 200:
         response_data = response.json()
         result_header.write(f"## Rebalance Results")
-        summary_output = pd.DataFrame(response_data)[['Asset', 'Total', 'Action', 'FinalValue']]
+        summary_output = pd.DataFrame(response_data)[['Asset', 'Total', 'Action', 'FinalValue']].style.format({
+            "Total": "${:,.0f}",
+            "FinalValue": "${:,.0f}",
+        })
         result_asset_table.dataframe(summary_output)
         result_asset_summary.write(f"Total value after rebalancing: ${summary_output.FinalValue.sum():,.0f}")
     else:
         st.error(f"Error: {response.text}")
 
+def get_ticker_value(target_date):
+    collection = 'usd'
+    document, returned_date = get_mongo_document_by_date(collection, target_date)
+    df = pd.DataFrame(document['portfolio_details'])
+    # Create dictionary with Ticker as key and Value as value
+    ticker_value_dict = df.set_index('Ticker')['Value'].to_dict()
+    return ticker_value_dict
+
 st.write("# ⚖️ Asset Rebalancer")
 st.write("__:one: Enter your assets and weights__")
 
+target_date = st.date_input("Date", value=None, help="Enter the date to retrieve data for")
+ticker_value_dict = get_ticker_value(target_date)
+
 # Initialize asset data
 df = pd.DataFrame([
-    {"asset": "VTI", "weight": 0.50, "current_value": 0},
-    {"asset": "VEA", "weight": 0.15, "current_value": 0},
-    {"asset": "VWO", "weight": 0.15, "current_value": 0 },
-    {"asset": "BND", "weight": 0.20, "current_value": 0}
+    {"asset": "VTI", "weight": 0.50, "current_value": ticker_value_dict.get("VTI")},
+    {"asset": "VEA", "weight": 0.15, "current_value": ticker_value_dict.get("VEA")},
+    {"asset": "VWO", "weight": 0.15, "current_value": ticker_value_dict.get("VWO")},
+    {"asset": "BND", "weight": 0.20, "current_value": ticker_value_dict.get("BND")}
 ])
 
 edited_df = st.data_editor(
