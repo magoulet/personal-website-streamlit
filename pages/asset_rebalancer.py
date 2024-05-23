@@ -40,7 +40,6 @@ def submit_rebalance_form():
             "FinalValue": "${:,.0f}",
         })
         result_asset_table.dataframe(summary_output)
-        result_asset_summary.write(f"Total value after rebalancing: ${summary_output.FinalValue.sum():,.0f}")
     else:
         st.error(f"Error: {response.text}")
 
