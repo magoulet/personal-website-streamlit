@@ -109,7 +109,7 @@ df = pd.DataFrame(documents)
 latest_application = get_latest_application(df)
 
 # Subset DataFrame for display
-df_display = df[display_columns]
+df_display = df[display_columns].sort_values("date_applied", ascending=False)
 
 # Display and edit DataFrame
 edited_df = st.data_editor(
