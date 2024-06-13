@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 import requests
 
-from utilities.mongo import get_mongo_document_by_date
+from utilities.mongo import get_mongo_portfolio_document_by_date
 
 # Define function to submit rebalance form
 def submit_rebalance_form():
@@ -46,7 +46,7 @@ def submit_rebalance_form():
 def get_ticker_value(target_date):
     collection = 'usd'
     try:
-        document, returned_date = get_mongo_document_by_date(collection, target_date)
+        document, returned_date = get_mongo_portfolio_document_by_date(collection, target_date)
         if not document:
             raise ValueError(f"No document found for the date: {target_date}")
 

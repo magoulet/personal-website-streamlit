@@ -5,7 +5,7 @@ from pymongo import MongoClient
 import streamlit as st
 from sqlalchemy import text
 
-from utilities.mongo import get_mongo_document_by_date
+from utilities.mongo import get_mongo_portfolio_document_by_date
 
 
 def create_plot(df, currency):
@@ -32,7 +32,7 @@ def process_and_display_data(currency, df_query, collection_key):
     df = conn.query(df_query, ttl=60 * 60)
     create_plot(df, currency)
     
-    document, date = get_mongo_document_by_date(collection_key)
+    document, date = get_mongo_portfolio_document_by_date(collection_key)
     df = pd.DataFrame(document['portfolio_details'])
 
     holding_details = df.style.format({
