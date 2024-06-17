@@ -9,7 +9,7 @@ import streamlit as st
 
 def get_gnucash_budget(month):
     conn = st.connection("gnucashDb", type="sql", ttl=None)
-
+    year = datetime.now().year
     query = f"SELECT \
             budget_amounts.period_num , \
             budget_amounts.amount_num , \
@@ -21,7 +21,7 @@ def get_gnucash_budget(month):
             LEFT JOIN accounts \
             ON budget_amounts.account_guid = accounts.guid \
             WHERE budget_amounts.period_num = {month} AND \
-            budgets.name LIKE '2023';"
+            budgets.name LIKE '{year}';"
 
     df = conn.query(query, ttl=60*5)
 
