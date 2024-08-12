@@ -77,6 +77,9 @@ df = pd.DataFrame([
     {"asset": "BND", "weight": 0.20, "current_value": ticker_value_dict.get("BND")}
 ])
 
+# Round the 'current_value' column to 2 decimal places
+df['current_value'] = df['current_value'].round(2)
+
 edited_df = st.data_editor(
     df,
     hide_index=True,
