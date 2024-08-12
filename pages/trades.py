@@ -51,8 +51,9 @@ if record_trade_feature:
         units = st.number_input(
             "Number of Units (Negative = Sell)",
             help="Negative values will be interpreted as a sell",
+            format="%0.7f"
         )
-        price = st.number_input("Price")
+        price = st.number_input("Price", format="%0.7f")
         fees = st.number_input(
             "Fees",
             min_value=0,
