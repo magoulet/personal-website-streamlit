@@ -4,7 +4,7 @@ from sqlalchemy import text
 
 def get_data():
     conn = st.connection("temperatures", type="sql", ttl=None)
-    df = conn.query("SELECT * FROM temperaturedata WHERE dateandtime >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)", ttl=60*5)
+    df = conn.query("SELECT * FROM temperaturedata WHERE dateandtime >= DATE_SUB(CURDATE(), INTERVAL 2 DAY)", ttl=60*5)
     return df
 
 def create_plot(df):
