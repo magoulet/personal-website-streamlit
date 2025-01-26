@@ -1,0 +1,9 @@
+default_portfolio:
+  - asset: "VTI"
+    weight: 0.50
+  - asset: "BND"
+    weight: 0.20
+  - asset: "VWO"
+    weight: 0.15
+  - asset: "VEA"
+    weight: 0.15
