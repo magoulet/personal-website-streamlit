@@ -1,10 +1,18 @@
-version: "3.9"
 services:
   app:
     build: .
+    container_name: personal-website-streamlit
     restart: unless-stopped
-    ports:
-      - "8501:8501"
+    # ports:
+      # - "8501:8501"
     volumes:
       - .:/app
-  
+    networks:
+      - internal_net
+      - db_net
+
+networks:
+  internal_net:
+    external: true
+  db_net:
+    external: true
