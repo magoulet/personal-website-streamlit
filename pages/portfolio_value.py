@@ -59,9 +59,8 @@ def process_and_display_data(currency, df_query, collection_key):
         st.write(general_info)
         st.dataframe(holding_details, hide_index=True)
 
+# Process and display data for USD
+process_and_display_data("USD 🇺🇲", "SELECT * FROM usddata", 'usd')
 
 # Process and display data for CAD
 process_and_display_data("CAD 🇨🇦", "SELECT * FROM caddata", 'cad')
-
-# Process and display data for USD
-process_and_display_data("USD 🇺🇲", "SELECT * FROM usddata", 'usd')
