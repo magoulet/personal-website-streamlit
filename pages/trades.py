@@ -33,11 +33,11 @@ st.write(f"{len(trades)} entries")
 # List of transfers
 st.write("# All transfers to date")
 st.write("## USD 🇺🇲")
-st.dataframe(create_transfer_dataframe(transfers, "USD"))
+st.dataframe(create_transfer_dataframe(transfers, "USD"), hide_index=True)
 # st.line_chart(transfers[mask], x="date", y="contribution")
 
 st.write("## CAD 🇨🇦")
-st.dataframe(create_transfer_dataframe(transfers, "CAD"))
+st.dataframe(create_transfer_dataframe(transfers, "CAD"), hide_index=True)
 # st.line_chart(transfers[mask], x="date", y="contribution")
 
 record_trade_feature = st.toggle("Record new trade")
@@ -91,3 +91,36 @@ if record_trade_feature:
                 s.commit()
 
             st.write("Trade recorded")
+
+record_trade_transfer = st.toggle("Record new transfer")
+
+if record_trade_transfer:
+    with st.form("Record Transfer"):
+        st.write("# Record New Transfer")
+        date = st.date_input("Date")
+        amount = st.number_input("amount", format="%0.2f")
+        broker = st.radio("Broker", st.secrets["brokers"])
+        currency = st.radio("Currency", st.secrets["currencies"])
+        notes = st.text_area(label='Notes')
+
+        submitted = st.form_submit_button("Submit")
+
+        if submitted:
+            with conn.session as s:
+                s.execute(
+                    text("INSERT INTO contributions ("
+                            "date, contribution, broker, currency, notes"
+                            ") VALUES ("
+                            ":date, :amount, :broker, :currency, :notes"
+                            ");"),
+                    params=dict(
+                        date=date,
+                        amount=amount,
+                        broker=broker,
+                        currency=currency,
+                        notes=notes,
+                        )
+                )
+                s.commit()
+
+            st.write("Transfer recorded")
