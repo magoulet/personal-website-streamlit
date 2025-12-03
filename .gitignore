@@ -175,3 +175,6 @@ nginx.conf
 
 # Portfolio configuration
 portfolio_config.yaml
+
+# Pyenv
+.python-version
