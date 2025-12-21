@@ -5,6 +5,7 @@ import pandas as pd
 import requests
 import streamlit as st
 import yaml
+from requests_aws4auth import AWS4Auth
 
 from utilities.mongo import get_mongo_portfolio_document_by_date
 
@@ -22,8 +23,10 @@ def load_portfolio_config():
 
 # Define function to submit rebalance form
 def submit_rebalance_form():
-    rebalance_api_url = st.secrets["rebalance_api_url"]
-    rebalance_api_key = st.secrets["rebalance_api_key"]
+    api_url = st.secrets["rebalance_api_url"]
+    api_access_key = st.secrets["rebalance_api_access_key"]
+    api_secret_key = st.secrets["rebalance_api_secret_key"]
+    api_region = st.secrets["rebalance_api_region"]
 
     # create dictionaries for the model and values
     model_dict = edited_df.set_index('asset')['weight'].to_dict()
@@ -36,24 +39,31 @@ def submit_rebalance_form():
         'values': values_dict
     }
 
-    if not rebalance_api_url:
+    if not api_url:
         st.error("API endpoint is not set")
         return
 
-    headers = {
-        "Content-Type": "application/json",
-        "x-api-key": rebalance_api_key
-    }
-
-    response = requests.post(rebalance_api_url, json=payload, headers=headers)
+    auth = AWS4Auth(api_access_key, api_secret_key, api_region, 'execute-api')
+    response = requests.post(api_url, json=payload, auth=auth)
 
     if response.status_code == 200:
         response_data = response.json()
         result_header.write(f"## Rebalance Results")
-        summary_output = pd.DataFrame(response_data)[['Asset', 'Total', 'Action', 'FinalValue']].style.format({
+        
+        # Extract the results array
+        results_df = pd.DataFrame(response_data['results'])
+        
+        # Map to your expected columns
+        summary_output = results_df[['asset', 'amount', 'action', 'target_value']].rename(columns={
+            'asset': 'Asset',
+            'amount': 'Total',
+            'action': 'Action',
+            'target_value': 'FinalValue'
+        }).style.format({
             "Total": "${:,.0f}",
             "FinalValue": "${:,.0f}",
         })
+        
         result_asset_table.dataframe(summary_output)
     else:
         st.error(f"Error: {response.text}")
