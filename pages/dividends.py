@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime, timedelta
-from utilities.dividend_mongo import get_dividend_history, get_dividend_summary_stats, convert_currency_amounts
+from utilities.dividend_helper import get_dividend_history, get_dividend_summary_stats, convert_currency_amounts
 
 st.set_page_config(page_title="Dividends", page_icon="💰", layout="wide")
 

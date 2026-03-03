@@ -7,7 +7,7 @@ import streamlit as st
 import yaml
 from requests_aws4auth import AWS4Auth
 
-from utilities.mongo import get_mongo_portfolio_document_by_date
+from utilities.postgres import get_postgres_portfolio_document_by_date
 
 
 def load_portfolio_config():
@@ -71,7 +71,7 @@ def submit_rebalance_form():
 def get_ticker_value(target_date):
     collection = 'usd'
     try:
-        document, returned_date = get_mongo_portfolio_document_by_date(collection, target_date)
+        document, returned_date = get_postgres_portfolio_document_by_date(collection, target_date)
         if not document:
             raise ValueError(f"No document found for the date: {target_date}")
 

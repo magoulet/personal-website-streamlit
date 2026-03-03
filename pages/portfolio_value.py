@@ -1,11 +1,9 @@
 from datetime import datetime
 import pandas as pd
 import plotly.express as px
-from pymongo import MongoClient
 import streamlit as st
-from sqlalchemy import text
 
-from utilities.mongo import get_mongo_portfolio_document_by_date
+from utilities.postgres import get_postgres_portfolio_document_by_date
 
 
 def create_plot(df, currency):
@@ -32,10 +30,11 @@ def process_and_display_data(currency, df_query, collection_key):
     df = conn.query(df_query, ttl=60 * 60)
     create_plot(df, currency)
     
-    document, date = get_mongo_portfolio_document_by_date(collection_key)
+    document, date = get_postgres_portfolio_document_by_date(collection_key)
     df = pd.DataFrame(document['portfolio_details'])
 
-    holding_details = df.style.format({
+    column_order = ["Ticker", "Qty", "Price", "Value", "Cost Basis", "Real. Gain", "Unreal. Gain ($)", "Unreal. Gain (%)", "Dividend Yield"]
+    holding_details = df[column_order].style.format({
         "Qty": "{:.1f}",
         "Price": "${:,.2f}",
         "Real. Gain": "${:,.0f}",

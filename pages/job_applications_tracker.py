@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 import uuid
 
-from utilities.mongo import get_mongo_job_applications, insert_mongo_job_applications ,update_mongo_job_applications
+from utilities.postgres import get_postgres_job_applications, insert_postgres_job_applications, update_postgres_job_applications
 
 
 # Modal to create new application
@@ -46,8 +46,8 @@ def add_application(latest_application):
             try:
                 # Convert the new application to DataFrame
                 new_application_df = pd.DataFrame([new_application])
-                # Insert the new application into MongoDB
-                insert_result = insert_mongo_job_applications(new_application_df)
+                # Insert the new application into PostgreSQL
+                insert_result = insert_postgres_job_applications(new_application_df)
                 st.success("New application added successfully!")
 
             except Exception as e:
@@ -104,7 +104,7 @@ core_columns = [
 st.write("# 🧊 Job Applications Tracker")
 
 # Retrieve applications
-documents = get_mongo_job_applications()
+documents = get_postgres_job_applications()
 df = pd.DataFrame(documents)
 latest_application = get_latest_application(df)
 
@@ -137,7 +137,7 @@ edited_df = st.data_editor(
 if st.button("Save Changes"):
     try:
         # Update the database with the merged DataFrame
-        result = update_mongo_job_applications(edited_df, df, core_columns)
+        result = update_postgres_job_applications(edited_df, df, core_columns)
         st.success("Changes saved successfully!")
 
     except Exception as e:
