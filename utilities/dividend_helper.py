@@ -92,15 +92,31 @@ def convert_currency_amounts(df, target_currency):
 
 
 def get_dividend_summary_stats(df):
+    """Per-currency dividend summary.
+
+    Returns stats grouped by currency so CAD and USD are never silently added
+    together. When only one currency is present (e.g. after conversion or a
+    currency filter) there is a single entry.
+    """
     if df.empty:
         return {}
-    
+
+    df = df.copy()
     df['ex_dividend_date'] = pd.to_datetime(df['ex_dividend_date'])
-    monthly_totals = df.groupby([df['ex_dividend_date'].dt.year, df['ex_dividend_date'].dt.month])['dividend_amount'].sum()
-    monthly_avg = monthly_totals.mean() if not monthly_totals.empty else 0
-    
+
+    by_currency = {}
+    for currency, group in df.groupby('currency'):
+        monthly_totals = group.groupby(
+            [group['ex_dividend_date'].dt.year, group['ex_dividend_date'].dt.month]
+        )['dividend_amount'].sum()
+        by_currency[currency] = {
+            'total': float(group['dividend_amount'].sum()),
+            'monthly_average': (
+                float(monthly_totals.mean()) if not monthly_totals.empty else 0.0
+            ),
+        }
+
     return {
-        'monthly_average': monthly_avg,
-        'total_dividends': df['dividend_amount'].sum(),
-        'unique_tickers': df['ticker'].nunique()
+        'by_currency': by_currency,
+        'unique_tickers': df['ticker'].nunique(),
     }

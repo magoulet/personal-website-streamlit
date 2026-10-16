@@ -53,15 +53,38 @@ else:
     if ticker_filter != "All":
         df = df[df['ticker'] == ticker_filter]
     
-    # Summary metrics
+    # Summary metrics (never mix currencies when showing separately)
     stats = get_dividend_summary_stats(df)
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Total Dividends", f"${stats.get('total_dividends', 0):,.2f}")
-    with col2:
-        st.metric("Monthly Average", f"${stats.get('monthly_average', 0):,.2f}")
-    with col3:
-        st.metric("Unique Tickers", stats.get('unique_tickers', 0))
+    by_currency = stats.get('by_currency', {})
+    currencies = sorted(by_currency.keys())
+
+    if len(currencies) == 1:
+        currency_label = currencies[0]
+        values = by_currency[currency_label]
+        summary_cols = st.columns(3)
+        summary_cols[0].metric(
+            f"Total Dividends ({currency_label})",
+            f"${values['total']:,.2f}",
+        )
+        summary_cols[1].metric(
+            f"Monthly Average ({currency_label})",
+            f"${values['monthly_average']:,.2f}",
+        )
+        summary_cols[2].metric("Unique Tickers", stats.get('unique_tickers', 0))
+    else:
+        st.caption("Showing currencies separately — totals are not combined.")
+        summary_cols = st.columns(len(currencies) * 2 + 1)
+        for index, currency_label in enumerate(currencies):
+            values = by_currency[currency_label]
+            summary_cols[index * 2].metric(
+                f"Total Dividends ({currency_label})",
+                f"${values['total']:,.2f}",
+            )
+            summary_cols[index * 2 + 1].metric(
+                f"Monthly Average ({currency_label})",
+                f"${values['monthly_average']:,.2f}",
+            )
+        summary_cols[-1].metric("Unique Tickers", stats.get('unique_tickers', 0))
     
     # Monthly totals chart
     st.subheader("Monthly Dividend Totals")
