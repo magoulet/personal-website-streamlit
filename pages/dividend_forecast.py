@@ -137,12 +137,12 @@ col1, col2, col3, col4 = st.columns(4)
 col1.metric("Projected next 12m (USD)", f"${projected_usd:,.0f}")
 col2.metric("Projected next 12m (CAD)", f"${projected_cad:,.0f}")
 col3.metric(
-    f"Projected combined ({combined_currency})", f"${projected_combined:,.0f}"
+    f"Projected combined ({combined_currency})", f"${projected_combined:,.0f}",
+    delta=f"{delta_pct:+.1f}%",
 )
 col4.metric(
     f"Trailing 12m actual ({combined_currency})",
     f"${actual_combined:,.0f}",
-    delta=f"{delta_pct:+.1f}%",
 )
 
 # --- Monthly income chart --------------------------------------------------
