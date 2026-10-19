@@ -78,7 +78,7 @@ def to_target(amount, currency, target, rates):
 st.title("🔮 Dividend Income Forecast")
 st.caption(
     "Trailing-twelve-month run-rate grown by each holding's own long-run "
-    "per-share dividend growth (clamped, overridable). Shares held constant."
+    "per-share dividend growth, with dividends reinvested per position (DRIP)."
 )
 
 df, run_date = load_forecast()
@@ -274,5 +274,5 @@ st.dataframe(
 
 st.caption(
     f"Forecast run: {run_date} · {len(summary)} holdings · "
-    f"DPS grown from year 1 · shares held constant."
+    f"per-share growth + per-position DRIP (annual, current prices)."
 )
